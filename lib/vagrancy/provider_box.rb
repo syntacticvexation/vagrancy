@@ -23,6 +23,7 @@ module Vagrancy
 
     def delete
       @filestore.delete(file_path) if exists?
+      @filestore.delete_empty_dirs()
     end
 
     def exists?

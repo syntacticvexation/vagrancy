@@ -21,6 +21,12 @@ module Vagrancy
       end
     end
 
+    def boxes()
+      Dir.glob("#{@base_path}*/*").select {|d| File.directory? d}.collect do |entry|
+        entry.sub! "#{@base_path}", ""
+      end
+    end
+    
     # Safely writes by locking
     def write(file, io_stream)
       with_parent_directory_created(file) do 
@@ -36,6 +42,9 @@ module Vagrancy
       File.unlink("#{@base_path}#{file}")
     end
 
+    def delete_empty_dirs()
+      Dir["#{@base_path}*/**/"].reverse_each { |d| Dir.rmdir d if Dir.entries(d).sort==%w(. ..) }
+    end
 
     private
 
