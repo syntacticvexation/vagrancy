@@ -95,7 +95,7 @@ def create_package(target)
   sh "mkdir #{package_dir}/lib/ruby"
   sh "tar -xzf packaging/traveling-ruby-#{TRAVELING_RUBY_VERSION}-#{target}.tar.gz -C #{package_dir}/lib/ruby"
   sh "cp packaging/wrapper.sh #{package_dir}/vagrancy"
-  sh "cp packaging/vagrancy.service.example #{package_dir}/vagrancy"
+  sh "cp packaging/vagrancy.service.example #{package_dir}/vagrancy.service.example"
   sh "cp -pR packaging/vendor #{package_dir}/lib/"
   sh "cp Gemfile Gemfile.lock #{package_dir}/lib/vendor/"
   sh "mkdir #{package_dir}/lib/vendor/.bundle"
