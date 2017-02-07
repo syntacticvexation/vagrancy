@@ -52,6 +52,7 @@ describe Vagrancy::ProviderBox do
       allow(filestore).to receive(:exists?).with('myuser/mybox/1.2.1/virtualbox/box').and_return true
       
       expect(filestore).to receive(:delete).with('myuser/mybox/1.2.1/virtualbox/box')
+      expect(filestore).to receive(:delete_empty_dirs)
 
       provider_box.delete
     end
@@ -59,6 +60,7 @@ describe Vagrancy::ProviderBox do
       allow(filestore).to receive(:exists?).with('myuser/mybox/1.2.1/virtualbox/box').and_return false
       
       expect(filestore).to_not receive(:delete).with(anything)
+      expect(filestore).to receive(:delete_empty_dirs)
 
       provider_box.delete
     end

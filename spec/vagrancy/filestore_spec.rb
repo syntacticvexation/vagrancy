@@ -8,6 +8,7 @@ describe Vagrancy::Filestore do
   let(:filestore) { Vagrancy::Filestore.new(base_path) }
   let(:transaction_file) { double 'transaction_file' }
   let(:write_lock) { double 'transaction_file' }
+  let(:io_stream) { double 'IO stream' }
 
   describe '#exists?' do
     it "delegates to File.exists?" do
@@ -57,14 +58,14 @@ describe Vagrancy::Filestore do
         allow(Dir).to receive(:exists?).with('/root/somedir').and_return false
         expect(FileUtils).to receive(:mkdir_p).with('/root/somedir')
 
-        filestore.write('somedir/thefile.txt', 'mycontent')
+        filestore.write('somedir/thefile.txt', io_stream)
       end
 
       it 'not created if they already exist' do
         allow(Dir).to receive(:exists?).with('/root/somedir').and_return true
         expect(FileUtils).to_not receive(:mkdir_p)
 
-        filestore.write('somedir/thefile.txt', 'mycontent')
+        filestore.write('somedir/thefile.txt', io_stream)
       end
     end
 
@@ -76,7 +77,7 @@ describe Vagrancy::Filestore do
         allow(write_lock).to receive(:flock)
         allow(write_lock).to receive(:close)
         allow(transaction_file).to receive(:close)
-        allow(transaction_file).to receive(:write)
+        allow(IO).to receive(:copy_stream)
         allow(transaction_file).to receive(:flush)
         allow(transaction_file).to receive(:path).and_return('/root/file.json.txn')
         allow(File).to receive(:open).with('/root/file.json.txn', File::RDWR|File::CREAT, 0644).and_return transaction_file
@@ -84,22 +85,22 @@ describe Vagrancy::Filestore do
       end
 
       it 'writes content to the transaction file' do
-        expect(transaction_file).to receive(:write).with('mycontent')
+        expect(IO).to receive(:copy_stream).with(io_stream, transaction_file)
 
-        filestore.write('file.json', 'mycontent')
+        filestore.write('file.json', io_stream)
       end
 
       it 'locks the transaction via the write lock before writing' do
         expect(write_lock).to receive(:flock).with(File::LOCK_EX).ordered
-        expect(transaction_file).to receive(:write).ordered
+        expect(IO).to receive(:copy_stream).with(io_stream, transaction_file).ordered
         
-        filestore.write('file.json', 'mycontent')
+        filestore.write('file.json', io_stream)
       end
 
       it 'moves the transaction file over the top of the original file' do
         expect(FileUtils).to receive(:mv).with('/root/file.json.txn', '/root/file.json')
 
-        filestore.write('file.json', 'mycontent')
+        filestore.write('file.json', io_stream)
       end
 
       it 'moves the transaction file within the lock' do
@@ -107,44 +108,44 @@ describe Vagrancy::Filestore do
         expect(FileUtils).to receive(:mv).with('/root/file.json.txn', '/root/file.json')
         expect(write_lock).to receive(:close).ordered
 
-        filestore.write('file.json', 'mycontent')
+        filestore.write('file.json', io_stream)
       end
 
       it 'flushes the transaction file before moving over the original file' do
         expect(transaction_file).to receive(:flush).ordered
         expect(FileUtils).to receive(:mv).ordered
 
-        filestore.write('file.json', 'mycontent')
+        filestore.write('file.json', io_stream)
       end
 
       it 'always closes the transaction file' do 
-        allow(transaction_file).to receive(:write).and_raise 'some error'
+        allow(IO).to receive(:copy_stream).and_raise 'some error'
 
         expect(transaction_file).to receive(:close)
-        expect{filestore.write('file.json', 'mycontent')}.to raise_error
+        expect{filestore.write('file.json', io_stream)}.to raise_error
       end
 
       it 'always removes the transaction file if it exists' do
-        allow(transaction_file).to receive(:write).and_raise 'some error'
+        allow(IO).to receive(:copy_stream).and_raise 'some error'
         allow(File).to receive(:exists?).with('/root/file.json.txn').and_return true
       
         expect(File).to receive(:unlink).with('/root/file.json.txn')
-        expect{filestore.write('file.json', 'mycontent')}.to raise_error
+        expect{filestore.write('file.json', io_stream)}.to raise_error
       end
 
       it 'always closes the write lock' do
-        allow(transaction_file).to receive(:write).and_raise 'error in cleanup'
+        allow(IO).to receive(:copy_stream).and_raise 'error in cleanup'
 
         expect(write_lock).to receive(:close)
-        expect{filestore.write('file.json', 'mycontent')}.to raise_error
+        expect{filestore.write('file.json', io_stream)}.to raise_error
       end
 
       it 'always removes the lock file if it exists' do
-        allow(transaction_file).to receive(:write).and_raise 'error in cleanup'
+        allow(IO).to receive(:copy_stream).and_raise 'error in cleanup'
         allow(File).to receive(:exists?).with('/root/file.json.lock').and_return true
 
         expect(File).to receive(:unlink).with('/root/file.json.lock')
-        expect{filestore.write('file.json', 'mycontent')}.to raise_error
+        expect{filestore.write('file.json', io_stream)}.to raise_error
 
       end
 

@@ -8,7 +8,11 @@ module Vagrancy
     end
 
     def exists?(file)
-      File.exists?("#{@base_path}#{file}")
+      File.exists?(file_path(file))
+    end
+
+    def file_path(file)
+      "#{@base_path}#{file}"
     end
 
     def directories_in(path)
@@ -17,10 +21,16 @@ module Vagrancy
       end
     end
 
+    def boxes()
+      Dir.glob("#{@base_path}*/*").select {|d| File.directory? d}.collect do |entry|
+        entry.sub! "#{@base_path}", ""
+      end
+    end
+    
     # Safely writes by locking
-    def write(file, content)
+    def write(file, io_stream)
       with_parent_directory_created(file) do 
-        transactionally_write(file, content)
+        transactionally_write(file, io_stream)
       end
     end
 
@@ -32,6 +42,9 @@ module Vagrancy
       File.unlink("#{@base_path}#{file}")
     end
 
+    def delete_empty_dirs()
+      Dir["#{@base_path}*/**/"].reverse_each { |d| Dir.rmdir d if Dir.entries(d).sort==%w(. ..) }
+    end
 
     private
 
@@ -41,11 +54,11 @@ module Vagrancy
       yield
     end
 
-    def transactionally_write(file, content)
+    def transactionally_write(file, io_stream)
       within_file_lock(file) do
         begin 
           transaction_file = File.open("#{@base_path}#{file}.txn", File::RDWR|File::CREAT, 0644)
-          transaction_file.write(content)
+          IO.copy_stream(io_stream,transaction_file)
           transaction_file.flush
           FileUtils.mv(transaction_file.path, "#{@base_path}#{file}")
         ensure

@@ -4,7 +4,7 @@ require 'bundler'
 RSpec::Core::RakeTask.new(:spec)
 
 PACKAGE_NAME = "vagrancy"
-VERSION = "0.0.1"
+VERSION = "0.0.4"
 TRAVELING_RUBY_VERSION = "20150715-2.2.2"
 PUMA_VERSION="2.11.2"
 
@@ -91,9 +91,11 @@ def create_package(target)
   sh "mkdir -p #{package_dir}/lib/app"
   sh "cp -r config.ru config.sample.yml lib #{package_dir}/lib/app/"
   sh "cp -r config.sample.yml #{package_dir}/"
+  sh "cp -r LICENCE.txt #{package_dir}/"
   sh "mkdir #{package_dir}/lib/ruby"
   sh "tar -xzf packaging/traveling-ruby-#{TRAVELING_RUBY_VERSION}-#{target}.tar.gz -C #{package_dir}/lib/ruby"
   sh "cp packaging/wrapper.sh #{package_dir}/vagrancy"
+  sh "cp packaging/vagrancy.service.example #{package_dir}/vagrancy.service.example"
   sh "cp -pR packaging/vendor #{package_dir}/lib/"
   sh "cp Gemfile Gemfile.lock #{package_dir}/lib/vendor/"
   sh "mkdir #{package_dir}/lib/vendor/.bundle"
@@ -108,10 +110,10 @@ end
 
 def download_runtime(target)
   sh "cd packaging && curl -L -O --fail " +
-    "http://d6r77u77i8pq3.cloudfront.net/releases/traveling-ruby-#{TRAVELING_RUBY_VERSION}-#{target}.tar.gz"
+    "https://d6r77u77i8pq3.cloudfront.net/releases/traveling-ruby-#{TRAVELING_RUBY_VERSION}-#{target}.tar.gz"
 end
 
 def download_native_extension(target, gem_name_and_version)
   sh "curl -L --fail -o packaging/traveling-ruby-#{TRAVELING_RUBY_VERSION}-#{target}-#{gem_name_and_version}.tar.gz " +
-    "http://d6r77u77i8pq3.cloudfront.net/releases/traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{target}/#{gem_name_and_version}.tar.gz"
+    "https://d6r77u77i8pq3.cloudfront.net/releases/traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{target}/#{gem_name_and_version}.tar.gz"
 end

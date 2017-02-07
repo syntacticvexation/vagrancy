@@ -1,0 +1,24 @@
+# Example file for systemd
+#
+# - Copy this file to /etc/systemd/system/vagrancy.service
+#   [Note: symlinking did not work on Ubuntu 16.04.1!]
+# - Replace /root/vagrancy-0.0.3-linux-x86_64 with your installation directory.
+# - Replace the IP 127.0.0.1 with your intranet IP or whatever IP your server
+#   should listen on.
+# - Reload systemd config: systemctl daemon-reload
+# - Enable the systemd service: systemctl enable vagrancy.service
+# - Lookup status: systemctl status vagrancy.service
+# - Restart the service: systemctl restart vagrancy.service
+#
+[Unit]
+Description=vagrancy
+After=network.target auditd.service
+
+[Service]
+WorkingDirectory=/root/vagrancy-0.0.3-linux-x86_64
+ExecStart=/root/vagrancy-0.0.3-linux-x86_64/vagrancy -a 127.0.0.1
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

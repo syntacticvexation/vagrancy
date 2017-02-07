@@ -1,2 +1,5 @@
 .*.sw*
 data/*
+.bundle
+devbox/.vagrant
+*~

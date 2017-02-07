@@ -23,6 +23,7 @@ module Vagrancy
 
     def delete
       @filestore.delete(file_path) if exists?
+      @filestore.delete_empty_dirs()
     end
 
     def exists?
@@ -33,14 +34,14 @@ module Vagrancy
       base_site + '/' + path 
     end
 
+    def file_path
+      path + '/box'
+    end
+
     private 
 
     def base_site
       @request.scheme + '://' + @request.host + ':' + @request.port.to_s
-    end
-
-    def file_path
-      path + '/box'
     end
 
     def path
