@@ -1,40 +1,41 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    diff-lcs (1.2.5)
-    puma (2.11.2)
-      rack (>= 1.1, < 2.0)
-    rack (1.6.0)
-    rack-protection (1.5.3)
+    diff-lcs (1.3)
+    mustermann (1.0.0)
+    puma (3.9.1)
+    rack (2.0.3)
+    rack-protection (2.0.0)
       rack
-    rake (10.4.2)
-    rspec (3.2.0)
-      rspec-core (~> 3.2.0)
-      rspec-expectations (~> 3.2.0)
-      rspec-mocks (~> 3.2.0)
-    rspec-core (3.2.0)
-      rspec-support (~> 3.2.0)
-    rspec-expectations (3.2.0)
+    rake (12.0.0)
+    rspec (3.6.0)
+      rspec-core (~> 3.6.0)
+      rspec-expectations (~> 3.6.0)
+      rspec-mocks (~> 3.6.0)
+    rspec-core (3.6.0)
+      rspec-support (~> 3.6.0)
+    rspec-expectations (3.6.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.2.0)
-    rspec-mocks (3.2.0)
+      rspec-support (~> 3.6.0)
+    rspec-mocks (3.6.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.2.0)
-    rspec-support (3.2.1)
-    sinatra (1.4.5)
-      rack (~> 1.4)
-      rack-protection (~> 1.4)
-      tilt (~> 1.3, >= 1.3.4)
-    tilt (1.4.1)
+      rspec-support (~> 3.6.0)
+    rspec-support (3.6.0)
+    sinatra (2.0.0)
+      mustermann (~> 1.0)
+      rack (~> 2.0)
+      rack-protection (= 2.0.0)
+      tilt (~> 2.0)
+    tilt (2.0.8)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  puma (= 2.11.2)
+  puma
   rake
   rspec
   sinatra
 
 BUNDLED WITH
-   1.10.6
+   1.15.3
